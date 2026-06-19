@@ -48,7 +48,7 @@ Metadata contains a set of tables - as in a “database”, some fields have to 
 ## Top-level files
 
 ### Descriptive ReadMe File (readme.md)  
-[Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/readme.md)
+[Template](templates/readme.md)
 
 A text file describing the purpose and design of the study and the procedure used to generate localizations, perform species detection, and synchronize the audio files.
 
@@ -58,51 +58,50 @@ A text file describing the purpose and design of the study and the procedure use
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localized_events.csv)
 
 #### Example structure: 
-$${\color{red}\text{Modification to original document: adding example tables where columns are specified: could include table and column specifics depending on preference.}}$$
+
 | event_id | label | Start_timestamp | Duration | position | file_ids | file_start_time_offsets |
 | --- | --- | --- | --- | --- | --- | --- |  
 | event01000 | OVEN | 2025-05-20T10:00:00.000-05:00 | [662516.184452, 6124222.74555885, nan, 11] | 3 | ['0502_oven01.mp3', '0503_oven01.mp3', '0504_oven01.mp3', '0505_oven01.mp3', '0506_oven01.mp3'] | [3.5, 3.5, 3.5, 3.5, 3.5] | 
 
-#### Column Specifics:
-- event_id: unique within the dataset; fixed length; only alphanumeric characters and underscores
+#### Column dictionary:
+- `event_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
 	- Examples: pennsylvania2024grid1_00001, event01000 , 0001
-- label: species or other sound type name (e.g. “playback”) of the localized event
+- `label`: species or other sound type name (e.g. “playback”) of the localized event
 	- Matches a value in classes.csv class column
-- Start_timestamp: onset time of the event in ISO format
-- Duration: event length in seconds
-- position: localized position coordinate in meters: 
-	- UTM coordinates utm x, utm y ,elevation, utm zone
-	- For sensitive species:  (x,y) or (x,y,z) coordinates in meters relative to a reference point 
-- file_ids: list of file_id  for audio clips that participated in the localization
+- `start_timestamp`: onset time of the event in ISO format
+- `duration`: event length in seconds
+- `x`: localized position longitude in meters. CRS should be specified in README.md
+- `y`: localized position latitude in meters. CRS should be specified in README.md
+- [optional] `z`: localized position altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
+- `file_ids`: list of file_id  for audio clips that participated in the localization
 	- should match a value in the file_id column of audio_file_table.csv 
 	-** Alternatively, can list all file_id on which the event is detectable, even if the file did not participate in the localization of the event** what does this look like? 
-- file_start_time_offsets: time in seconds from start of each audio file to the the start of the clip 
+- `file_start_time_offsets`: time in seconds from start of each audio file to the the start of the clip 
 	- (for example, the event might start 10 seconds in to file1.wav and 15 seconds in to file2.wav) 
 
-#### *Optional* Fields:
+#### Other optional Fields:
 These are not generated as a single value in correlation-sum approaches, and thus are not required for all datasets
-- tdoas: List of relative time of arrival in seconds: one per file_id
+- `tdoas`: List of relative time of arrival in seconds: one per file_id
 	- Arbitrary reference point (often, tdoa=0 is based on the arrival time at one microphone)
-- distance_residuals: List of residual distance error: one per file_id, in meters
-- classifier_scores: List of classifier score (float): one per file_id
+- `distance_residuals`: List of residual distance error: one per file_id, in meters
+- `classifier_scores`: List of classifier score (float): one per file_id
 - **[which optional fields are useful for correlation-sum method?]
 Some sort of uncertainty measurement?**
 -  Boolean/categorical columns that describe validation checks performed on the event
 	- e.g. species_manually_confirmed: True/False; 
 
-### *Optional* Classes/sound types description (classes.csv)
+### [Optional] Classes/sound types description (classes.csv)
 
 This optional file lists and describes all classes (sound types) that occur in the “label” column of localized_events.csv. For instance, “Scarlet Tanager alarm call” might be one class. It can optionally include other columns that assist in the interpretation of the class or detail its taxonomy. If not included, be sure to describe the meaning of the values in “label” column of localized_events.csv in the README.md file. 
 
 #### Example Structure  
-$${\color{red}\text{needs revisions, sort of unclear classes, could provide a better example.}}$$
+
 | class | scientific_name | family | vocalization_type | common_name |
 | --- | --- | --- | --- | --- |
 | KAAM_song | *Chlorodrepanis stejnegeri* | Fringillidae | A | Kauai Amakihi |
 | KAAM_song | *Chlorodrepanis stejnegeri* | Fringillidae | B | Kauai Amakihi |
 | KAAM_call | *Chlorodrepanis stejnegeri* | Fringillidae |   | Kauai Amakihi |
 | KAAM_playback | | | song_A| | 
-$${\color{red}\text{*ask leonardo about ideas for this!}}$$
 
 
 ## Audio subfolder (audio/)
@@ -149,7 +148,7 @@ Each audio file will have a unique file_id and a row in localization_metadata/au
 | aru001_20250101_060000 | audio/aru001/20250101_060000.WAV | aru001 | 2025-01-01T06:00:00.000-05:00 |
 
 ### Example 3: Long audio files nested by recorder and other category
-$${\color{red}\text{DH: Idea for third example, not sure if anyone has multiple years/deployments of data they are submitting, but could be useful to include for this circumstance}}$$
+
 ```
 `audio/`
 ├── deployment2025/
@@ -167,8 +166,6 @@ $${\color{red}\text{DH: Idea for third example, not sure if anyone has multiple 
 	└── ...
 ```
 
-$${\color{red}\text{Add first two rows table}}$$
-
 
 
 ## Scripts subfolder (script/)
@@ -184,60 +181,58 @@ Frozen Python environment files (.yml) listing package versions
 
 ## Localization metadata subfolder (localization_metadata/)
 
-**Microphone location table (localization_metadata/microphone_location_table.csv) (formerly: point_table.csv)**  
-
-$${\color{red}\text{Unfinished example table:}}$$
-Columns:
-| point_id | utm_easting | utm_northing | elevation | utm_zone |
-| --- | --- | --- | --- | --- |  
-
+### Microphone location table (localization_metadata/point_table.csv)
 
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localization_metadata/point_table.csv)
 
-$${\color{red}\text{Change to have list describing each columns instead of paragraph description}}$$
-Tabulates the locations of all microphones. The coordinates (utm_e, utm_n, elevation, utm_zone) refer to the position of the microphone; UTM coordinates have units of meters. Sometimes RTK provides two elevation measurements: Ellipsoidal_Ht and Ortho_Ht; in this case it is recommended to retain both as additional columns
 
-*optional* array : must include this column if multiple arrays are included in the localization dataset. Each array should have a unique alpha-numeric ID containing only letters, numbers, spaces, underscores 
+- `point_id`: column values match values in audio_file_table point_id column.
+- `x`: microphone longitude in meters. CRS should be specified in README.md
+- `y`: microphone  latitude in meters. CRS should be specified in README.md
+- [optional] `z`: microphone altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
+- [optional] `array_id` : must include this column if multiple arrays are included in the localization dataset. Each array should have a unique alpha-numeric ID containing only letters, numbers, spaces, underscores 
 
-
-*optional* accuracy columns along 3 axes (east-west, north-south, elevation): | accuracy_ew | accuracy_ns | accuracy_elev: These are sometimes provided by RTK GPS. They can be an estimated value if you have not recorded it for each position. Readme should describe the accuracy metric or how accuracy was measured/approximated
+- [optional] `accuracy` columns along 3 axes (east-west, north-south, elevation): | accuracy_ew | accuracy_ns | accuracy_elev: These are sometimes provided by RTK GPS. They can be an estimated value if you have not recorded it for each position. Readme should describe the accuracy metric or how accuracy was measured/approximated
 
 The readme should describe how coordinates were determined; eg hardware used, correctional data and processing, and methodology.
 
-point_id  column values match values in audio_file_table point_id column.
 
 Additional columns such as notes, otho_ht, ellipsoidal_ht, can be included. 
 
-## Audio file table (localization_metadata/audio_file_table.csv)
+### Audio file table (localization_metadata/audio_file_table.csv)
 | file_id | relative_path  | point_id  | start_timestamp (ISO) |
 | --- | --- | --- | --- |
 
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localization_metadata/audio_file_table.csv)
 
-- The relative path provides the path to the audio file relative to the top-level of the dataset, e.g.   
+- `relative` path provides the path to the audio file relative to the top-level of the dataset, e.g.   
 `/audio/recorder001/clip101.wav`
-- point_id matches a value of point_id in the microphone_location_table.csv (formerly point_table.csv), the location where the audio file was recorded
+- `point_id` matches a value of point_id in the microphone_location_table.csv (formerly point_table.csv), the location where the audio file was recorded
 
 ### Project metadata and supplementary files
 These should be **sufficient to reproduce** the localized_events.csv from the contents of localization_metadata and /audio/ (up to some human participation in the process).
 
-## *Optional* Observed events optional subfolder (observed_events/)
+## [Optional] Observed events optional subfolder (observed_events/)
 
-Subfolder containing records of events seen (or produced) in person with position estimates (accuracy of position estimates should go in README). All of these are optional. 
+Subfolder containing records of events seen (or produced) in person with position location or estimates (accuracy of position estimates should go in README). All of these are optional. 
 
 ### Acoustic playback experiments (observed_events/playbacks.csv)
 
 
-| playback_id | playback_label | Start_timestamp | Duration | position |
-| --- | --- | --- | --- | --- |
-| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | [662516.184452, 6124222.74555885, nan, 11] |
+| playback_id | playback_label | Start_timestamp | Duration | x | y | z |
+| --- | --- | --- | --- | --- | --- | --- |
+| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 |  6124222.74555885 |  nan |
 
 Columns:  
-- playback_id: unique within the dataset; fixed length; only alphanumeric characters and underscores
-- label: species or other class name (e.g. “tone sweep”, “species mix”) of the playback, included in classes.csv
-- start_timestamp:  onset time of playback in ISO format 2025-05-20T10:00:00.000-05:00
-- duration: playback length in seconds
-- position: playback position coordinate in UTM/meters: (utm x, utm y ,elevation, utm zone)
+- `file_id`
+- `playback_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
+- `label`: species or other class name (e.g. “tone sweep”, “species mix”) of the playback, included in classes.csv
+- `start_timestamp`:  onset time of playback in ISO format 2025-05-20T10:00:00.000-05:00. Note that these are event specific, not specific for each file.
+- `duration`: playback length in seconds
+- `x`: event longitude in meters. CRS should be specified in README.md
+- `y`: event  latitude in meters. CRS should be specified in README.md
+- [optional] `z`: event altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
+- [optional] `notes`
 
 ### Field observations with positions (observed_events/observations.csv)  
 
@@ -248,13 +243,17 @@ table of human field observation of acoustic events with known positions
 
 
 Columns:
-- observed_event_id: unique within the dataset; fixed length; only alphanumeric characters and underscores
-- class_label: species or other class name (e.g. “songsparrow_aggression”) of the localized event
-- Start_timestamp: onset time of event in ISO format 2025-05-20T10:00:00.000-05:00
-- duration: event length in seconds
-- position: sound source position coordinate in meters: (utm x, utm y ,elevation, utm zone)
-comments
-- *optional*: direction (degrees CW from N): orientation of animal when sound was produced
+Columns:  
+- `file_id`
+- `observed_event_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
+- `label`: species or other class name (e.g. “tone sweep”, “species mix”) of the playback, included in classes.csv
+- `start_timestamp`:  onset time of playback in ISO format 2025-05-20T10:00:00.000-05:00
+- `duration`: event length in seconds
+- `x`: event longitude in meters. CRS should be specified in README.md
+- `y`: event  latitude in meters. CRS should be specified in README.md
+- [optional] `z`: event altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
+- [optional]: direction (degrees CW from N): orientation of animal when sound was produced
+- [optional] `notes`
 
 Can include files for other observation types, such as:  
 - Spot mapping  
