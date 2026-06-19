@@ -85,15 +85,11 @@ if __name__ == "__main__":
         'class_name': 'label',
         'receiver_start_time_offsets': 'file_start_time_offsets',
         'receiver_files': 'file_ids',})
-<<<<<<< HEAD:scripts/opso-metadata.py
-
+        
     df['x'] = [p[0] for p in df['location_estimate']]
     df['y'] = [p[1] for p in df['location_estimate']]
     df['z'] = [p[2] if len(p) > 2 else None for p in df['location_estimate']]
-
-=======
     
->>>>>>> 1c58088e1cd3c4270b9afcf0810d31313e88dd93:opso-metadata.py
     columns_to_keep = [
         'event_id', 
         'label', 
