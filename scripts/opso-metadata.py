@@ -53,10 +53,11 @@ if __name__ == "__main__":
     for event in event_list:
         # pp(event)
         
-        # Round numeric columns to 3 decimal places
+        # Round numeric columns 
         event['tdoas'] = [round(x, 7) for x in event['tdoas']]
         event['distance_residuals'] = [round(x, 3) for x in event['distance_residuals']]
-        
+        event['receiver_start_time_offsets'] = [round(x, 3) for x in event['receiver_start_time_offsets']]
+         
         # Convert to DataFrame
         df_e = pd.DataFrame([event])
         df_list.append(df_e)
@@ -84,11 +85,15 @@ if __name__ == "__main__":
         'class_name': 'label',
         'receiver_start_time_offsets': 'file_start_time_offsets',
         'receiver_files': 'file_ids',})
+<<<<<<< HEAD:scripts/opso-metadata.py
 
     df['x'] = [p[0] for p in df['location_estimate']]
     df['y'] = [p[1] for p in df['location_estimate']]
     df['z'] = [p[2] if len(p) > 2 else None for p in df['location_estimate']]
 
+=======
+    
+>>>>>>> 1c58088e1cd3c4270b9afcf0810d31313e88dd93:opso-metadata.py
     columns_to_keep = [
         'event_id', 
         'label', 
