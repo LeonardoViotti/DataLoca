@@ -192,23 +192,22 @@ Frozen Python environment files (.yml) listing package versions
 ## Localization metadata subfolder (localization_metadata/)
 As previously mentioned, these two tables are designed to be used in conjunction with the localization events (localization_events.csv). 
 ### Microphone location table (localization_metadata/point_table.csv)
-This table organizes the location metadata associated with each point. Point IDs from this table align with Point IDs from the audio file table (audio_file_table.csv). The coordinates (utm_e, utm_n, elevation, utm_zone) refer to the position of the microphone; UTM coordinates have units of meters. Sometimes RTK provides two elevation measurements: Ellipsoidal_Ht and Ortho_Ht; in this case it is recommended to retain both as additional columns.    
-[Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localization_metadata/point_table.csv)
+This table organizes the location metadata associated with each point. Point IDs from this table align with Point IDs from the audio file table (audio_file_table.csv). The coordinates refer to the microphone's position in meters, either using a projected CRS (e.g., UTM) or relative position offsets from a point (e.g., center of the array). The coordinate system should be referred to in the dataset readme.
 
-| point_id | utm_easting  | utm_northing  | elevation | utm_zone |
+| point_id | x  | y  | z |
+| --- | --- | --- | --- |
+| SBT-3-7-1 | 454901.8146 |	6080451.741	| 654.0784 | 
+
+
+| array | recorder_id | x | y | z |
 | --- | --- | --- | --- | --- |
-| SBT-3-7-1 | 454901.8146 |	6080451.741	| 654.0784 | 12 |  
-
-| array | recorder_id | utm_easting | utm_northing | utm_zone | latitude | longitude | elevation | ortho_HT | ins_HT | h_acc | v_acc |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
-| GSA | GSA-A1 | 193757.0716 | 5621716.216 | 13N | 50.66658934 | -109.3341542 | 676.3289 | 0 | 0 | 0.16 | 0.28|
-| GSA | GSA-A2 | 193757.1697 | 5621756.458 | 13N | 50.66695025 | -109.334186 | 677.1357 | 0 | 0 | 0.15 | 0.28 | 
-
+| GSA | GSA-A1 | 193757.0716 | 5621716.216 | 676.3289 | 0 |
+| GSA | GSA-A2 | 193757.1697 | 5621756.458 | 677.1357 | 0 | 
 - `point_id`: column values match values in audio_file_table point_id column.
 - `x`: microphone longitude in meters. CRS should be specified in README.md
 - `y`: microphone  latitude in meters. CRS should be specified in README.md
 - [optional] `z`: microphone altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
-- [optional] `array_id` : must include this column if multiple arrays are included in the localization dataset. Each array should have a unique alpha-numeric ID containing only letters, numbers, spaces, underscores 
+- [optional] `array_id` : must include this column if multiple arrays are included in the localization dataset. Each array should have a unique alpha-numeric ID containing only letters, numbers, spaces, and underscores 
 
 - [optional] `accuracy` columns along 3 axes (east-west, north-south, elevation): | accuracy_ew | accuracy_ns | accuracy_elev: These are sometimes provided by RTK GPS. They can be an estimated value if you have not recorded it for each position. Readme should describe the accuracy metric or how accuracy was measured/approximated
 
@@ -241,9 +240,9 @@ Subfolder containing records of events seen (or produced) in person with positio
 ### Acoustic playback experiments (observed_events/playbacks.csv)
 
 
-| playback_id | playback_label | Start_timestamp | duration | UTM_easting | UTM_northing | elevation | UTM_zone | file_ids | file_start_time_offsets | 
-| --- | --- | --- | --- | --- | --- | --- | --- | 
-| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 |  6124222.74555885 |  nan | 15 | 
+| playback_id | playback_label | Start_timestamp | duration | x | y | z  | file_ids | file_start_time_offsets | 
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | 
+| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 |  6124222.74555885 |  nan  |  | |
 
 Columns:  
 - `playback_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
@@ -260,10 +259,10 @@ Columns:
 ### Field observations with positions (observed_events/observations.csv)  
 
 Table of human field observations of acoustic events with known positions
-| observed_event_id |  label | Start_timestamp | duration | x | y | z | UTM_zone | direction* | 
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| focalfollow01 | KAAM_song_a | 2025-05-20T10:45:00 | 5 |  662516.184452 |  6124222.74555885| nan | 15 | 15 degrees |
-| focalfollow02 | KAAM_song_b | 2025-05-20T11:06:00 | 45 |  662516.184452 |  6124222.74555885| nan | 15 | 60 degrees |
+| observed_event_id |  label | Start_timestamp | duration | x | y | z  | direction | 
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| focalfollow01 | KAAM_song_a | 2025-05-20T10:45:00 | 5 |  662516.184452 |  6124222.74555885| nan  | 15 degrees |
+| focalfollow02 | KAAM_song_b | 2025-05-20T11:06:00 | 45 |  662516.184452 |  6124222.74555885| nan | 60 degrees |
 
 
 Columns:
