@@ -55,9 +55,7 @@ A text file describing the purpose and design of the study and the procedure use
 
 ### Event table (localized_events.csv) 
 
-All localized events should be contained within this table. This table acts as a central point for metadata organization and links with the localization_metadata tables.
-
-localized_events.csv -> audio_file_table.csv -> point_table.csv
+All localized events should be contained within this table.
 
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localized_events.csv)  
 
@@ -65,9 +63,12 @@ localized_events.csv -> audio_file_table.csv -> point_table.csv
 
 #### Example structure: 
 
-| event_id | label | Start_timestamp | duration | file_ids | file_start_time_offsets | mean_residual_rms | n_estimates | 
-| --- | --- | --- | --- | --- | --- | --- | --- |
-|TEWA_00000	|TEWA| 2025-05-31T05:23:45-05:00 | 3 | [TEWA_00000_L1N4E6.flac; TEWA_00000_L1N4E7.flac; TEWA_00000_L1N5E6.flac; TEWA_00000_L1N5E7.flac; TEWA_00000_L1N6E6.flac; TEWA_00000_L1N6E7.flac] | [124.280852, 123.276784, 120.226952, 123.139276, 124.208569, 116.931787] | 25.29 | 2
+
+| event_id | label | start_timestamp | duration | x | y | z | file_ids | file_start_time_offsets | tdoas | distance_residuals |
+|----------|-------|----------------|----------|------------|------------|------|----------|------------------------|-------|-------------------|
+| 2022020720_000 | BTBW | 2022-02-07 20:00:06-05:00 | 3 | -87.02998309 | 59.50950925 |  | [R006.WAV, R002.WAV, R004.WAV, R003.WAV, R008.WAV, R009.WAV, R005.WAV] | [6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0] | [0.0, 0.1280173, 0.1276840, 0.1305381, -0.0010869, -0.0015244, -0.0019202] | [0.0, -0.425, -0.932, -0.795, 0.295, -0.108, 0.010] |
+| 2022020720_001 | BTBW | 2022-02-07 20:00:06-05:00 | 3 | -87.00133077 | 59.19430599 |  | [R009.WAV, R008.WAV, R007.WAV, R006.WAV, R005.WAV] | [6.0, 6.0, 6.0, 6.0, 6.0] | [0.0, 0.0004548, 0.1302256, 0.0015381, -0.0010452] | [0.0, -0.051, -2.196, 0.145, -0.063] |
+| 2022020720_002 | BTBW | 2022-02-07 20:00:09-05:00 | 3 | -28.73259570 | 19.98542163 |  | [R001.WAV, R002.WAV, R004.WAV, R003.WAV, R007.WAV, R005.WAV] | [9.0, 9.0, 9.0, 9.0, 9.0, 9.0] | [0.0, 0.0026006, 0.0006423, 0.1321215, 0.1337673, 0.0003715] | [0.0, -0.424, 0.269, -1.638, -2.053, 0.433] |
 
 
 #### Column dictionary:
@@ -80,6 +81,9 @@ localized_events.csv -> audio_file_table.csv -> point_table.csv
 - `file_ids`: list of file_id  for audio clips that participated in the localization
 	- should match a value in the file_id column of audio_file_table.csv 
 	-** Alternatively, can list all file_id on which the event is detectable, even if the file did not participate in the localization of the event** what does this look like? 
+- `x`: localized position longitude in meters. CRS should be specified in README.md
+- `y`: localized position latitude in meters. CRS should be specified in README.md
+- [optional] `z`: localized position altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
 - `file_start_time_offsets`: time in seconds from start of each audio file to the the start of the clip 
 	- (for example, the event might start 10 seconds in to file1.wav and 15 seconds in to file2.wav) 
 
@@ -89,12 +93,8 @@ These are not generated as a single value in correlation-sum approaches, and thu
 	- Arbitrary reference point (often, tdoa=0 is based on the arrival time at one microphone)
 - `distance_residuals`: List of residual distance error: one per file_id, in meters
 - `classifier_scores`: List of classifier score (float): one per file_id
-- **[which optional fields are useful for correlation-sum method?]
-Some sort of uncertainty measurement?**
--  Boolean/categorical columns that describe validation checks performed on the event
-	- e.g. species_manually_confirmed: True/False; 
-- `residual_mean_rms`:   
-- `n_estimates`:  
+
+
 ### [Optional] Classes/sound types description (classes.csv)
 
 This optional file lists and describes all classes (sound types) that occur in the “label” column of localized_events.csv. For instance, “Scarlet Tanager alarm call” might be one class. It can optionally include other columns that assist in the interpretation of the class or detail its taxonomy. If not included, be sure to describe the meaning of the values in “label” column of localized_events.csv in the README.md file. 
@@ -191,18 +191,17 @@ Frozen Python environment files (.yml) listing package versions
 
 ## Localization metadata subfolder (localization_metadata/)
 As previously mentioned, these two tables are designed to be used in conjunction with the localization events (localization_events.csv). 
+
 ### Microphone location table (localization_metadata/point_table.csv)
 This table organizes the location metadata associated with each point. Point IDs from this table align with Point IDs from the audio file table (audio_file_table.csv). The coordinates refer to the microphone's position in meters, either using a projected CRS (e.g., UTM) or relative position offsets from a point (e.g., center of the array). The coordinate system should be referred to in the dataset readme.
 
-| point_id | x  | y  | z |
-| --- | --- | --- | --- |
-| SBT-3-7-1 | 454901.8146 |	6080451.741	| 654.0784 | 
+| recorder_id | x | y | z | array_id |
+|-------------|-------------:|-------------:|------:|------|
+| MSD-0230 | 61.88444952 | 244.9906262 | 23.176 | A1 |
+| MSD-0526 | 102.7985465 | 229.6864791 | 24.465 | A2 |
+| MSD-2345 | 135.8973872 | 220.6227250 | 24.663 | A2 |
 
 
-| array | recorder_id | x | y | z |
-| --- | --- | --- | --- | --- |
-| GSA | GSA-A1 | 193757.0716 | 5621716.216 | 676.3289 | 0 |
-| GSA | GSA-A2 | 193757.1697 | 5621756.458 | 677.1357 | 0 | 
 - `point_id`: column values match values in audio_file_table point_id column.
 - `x`: microphone longitude in meters. CRS should be specified in README.md
 - `y`: microphone  latitude in meters. CRS should be specified in README.md
@@ -217,12 +216,11 @@ The readme should describe how coordinates were determined; eg hardware used, co
 Additional columns such as notes, otho_ht, ellipsoidal_ht, can be included. 
 
 ### Audio file table (localization_metadata/audio_file_table.csv)
-| file_id | relative_path  | point_id  | start_timestamp (ISO) |
-| --- | --- | --- | --- |
-| ALFL_00000_L1N4E1.flac | audio\ALFL\L1N4E1\ALFL_00000_L1N4E1.flac | L1N4E1 | 2025-05-31T05:24:06-05:00 |
-| ALFL_00000_L1N4E2.flac | audio\ALFL\L1N4E2\ALFL_00000_L1N4E2.flac | L1N4E2 | 2025-05-31T05:24:06-05:00 |
-| ALFL_00000_L1N5E1.flac | audio\ALFL\L1N5E1\ALFL_00000_L1N5E1.flac | L1N5E1 | 2025-05-31T05:24:06-05:00 |
-
+| file | recorder_code | card_code | point_id |
+|------|---------------|-----------|------------|
+| MSD-0260_20250520_230000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
+| MSD-0260_20250509_120000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
+| MSD-0260_20250509_090000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
 
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localization_metadata/audio_file_table.csv)
 
@@ -240,7 +238,7 @@ Subfolder containing records of events seen (or produced) in person with positio
 ### Acoustic playback experiments (observed_events/playbacks.csv)
 
 
-| playback_id | playback_label | Start_timestamp | duration | x | y | z  | file_ids | file_start_time_offsets | 
+| playback_id | playback_label | Start_timestamp | duration | x | y | z  | file | file_start_time_offsets | 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | 
 | playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 |  6124222.74555885 |  nan  |  | |
 
@@ -252,7 +250,7 @@ Columns:
 - `x`: event longitude in meters. CRS should be specified in README.md
 - `y`: event  latitude in meters. CRS should be specified in README.md
 - [optional] `z`: event altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
-- `file_ids`
+- `file_id`
 - `file_start_time_offsets`
 - [optional] `notes`
 
