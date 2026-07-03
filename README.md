@@ -216,11 +216,11 @@ The readme should describe how coordinates were determined; eg hardware used, co
 Additional columns such as notes, otho_ht, ellipsoidal_ht, can be included. 
 
 ### Audio file table (localization_metadata/audio_file_table.csv)
-| file | recorder_code | card_code | point_id |
-|------|---------------|-----------|------------|
-| MSD-0260_20250520_230000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
-| MSD-0260_20250509_120000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
-| MSD-0260_20250509_090000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
+| file_id | relative_path | recorder_code | card_code | point_id |
+|---------|---------------|---------------|-----------|----------|
+| MSD-0260_20250520_230000.WAV| audio/MSD-0260_20250520_230000.WAV  | M12-2895 | MSD-0260 | loca_rail_06 |
+| MSD-0260_20250509_120000.WAV| audio/MSD-0260_20250509_120000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
+| MSD-0260_20250509_090000.WAV| audio/MSD-0260_20250509_090000.WAV | M12-2895 | MSD-0260 | loca_rail_06 |
 
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localization_metadata/audio_file_table.csv)
 
