@@ -195,11 +195,11 @@ As previously mentioned, these two tables are designed to be used in conjunction
 ### Microphone location table (localization_metadata/point_table.csv)
 This table organizes the location metadata associated with each point. Point IDs from this table align with Point IDs from the audio file table (audio_file_table.csv). The coordinates refer to the microphone's position in meters, either using a projected CRS (e.g., UTM) or relative position offsets from a point (e.g., center of the array). The coordinate system should be referred to in the dataset readme.
 
-| recorder_id | x | y | z | array_id |
-|-------------|-------------:|-------------:|------:|------|
-| MSD-0230 | 61.88444952 | 244.9906262 | 23.176 | A1 |
-| MSD-0526 | 102.7985465 | 229.6864791 | 24.465 | A2 |
-| MSD-2345 | 135.8973872 | 220.6227250 | 24.663 | A2 |
+| point_id | recorder_id | x | y | z | array_id |
+|----------|-------------|---|---|---|----------|
+| loca_rail_01 | MSD-0230 | 61.88444952 | 244.9906262 | 23.176 | A1 |
+| loca_rail_02 |  MSD-0526 | 102.7985465 | 229.6864791 | 24.465 | A2 |
+| loca_rail_03 | MSD-2345 | 135.8973872 | 220.6227250 | 24.663 | A2 |
 
 
 - `point_id`: column values match values in audio_file_table point_id column.
