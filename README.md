@@ -72,25 +72,19 @@ All localized events should be contained within this table.
 
 
 #### Column dictionary:
-- `event_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
-	- Examples: pennsylvania2024grid1_00001, event01000 , 0001
-- `label`: species or other sound type name (e.g. “playback”) of the localized event
-	- Matches a value in classes.csv class column
-- `start_timestamp`: onset time of the event in ISO format
-- `duration`: event length in seconds
-- `file_ids`: list of file_id  for audio clips that participated in the localization
-	- should match a value in the file_id column of audio_file_table.csv 
-	-** Alternatively, can list all file_id on which the event is detectable, even if the file did not participate in the localization of the event** what does this look like? 
-- `x`: localized position longitude in meters. CRS should be specified in README.md
-- `y`: localized position latitude in meters. CRS should be specified in README.md
-- [optional] `z`: localized position altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
-- `file_start_time_offsets`: time in seconds from start of each audio file to the the start of the clip 
-	- (for example, the event might start 10 seconds in to file1.wav and 15 seconds in to file2.wav) 
+- `event_id`: unique event key. Should be unique for the entire the dataset with fixed length and only contain alphanumeric characters and underscores. Examples: pennsylvania2024grid1_00001, event01000 , 0001
+- `label`: species or other sound type name (e.g. “playback”) of the localized event. Should matches a value in classes.csv class column
+- `start_timestamp`: onset time of the event in ISO format.
+- `duration`: event length in seconds. Alternatively, if fixed length clips are shared without event specific bounding boxes it can be the clip length.
+- `x`: localized event estimated position longitude in meters. CRS should be specified in README.md
+- `y`: localized event estimated position latitude in meters. CRS should be specified in README.md
+- [optional] `z`: localized event estimated position altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
+- `file_ids`: list of file_id  for audio clips that participated in the localization. Should match a value in the file_id column of audio_file_table.csv
+- `file_start_time_offsets`: time in seconds from start of each audio file to the the start of the clip. For example, the event might start 10 seconds in to file1.wav and 15 seconds in to file2.wav
 
 #### Other optional Fields:
 These are not generated as a single value in correlation-sum approaches, and thus are not required for all datasets
-- `tdoas`: List of relative time of arrival in seconds: one per file_id
-	- Arbitrary reference point (often, tdoa=0 is based on the arrival time at one microphone)
+- `tdoas`: list of relative time of arrival in seconds: one per file_id. Arbitrary reference point (often, tdoa=0) is based on the arrival time at one microphone.
 - `distance_residuals`: List of residual distance error: one per file_id, in meters
 - `classifier_scores`: List of classifier score (float): one per file_id
 
@@ -202,7 +196,8 @@ This table organizes the location metadata associated with each point. Point IDs
 | loca_rail_03 | MSD-2345 | 135.8973872 | 220.6227250 | 24.663 | A2 |
 
 
-- `point_id`: column values match values in audio_file_table point_id column.
+- `point_id`: deployment point key. Should match those in audio_file_table point_id column.
+- [optional]`recorder_id`: recorder key.
 - `x`: microphone longitude in meters. CRS should be specified in README.md
 - `y`: microphone  latitude in meters. CRS should be specified in README.md
 - [optional] `z`: microphone altitude in meters. Reference point if sea-level or relative to local position should be specified in README.md
@@ -224,9 +219,11 @@ Additional columns such as notes, otho_ht, ellipsoidal_ht, can be included.
 
 [Example](https://github.com/sammlapp/ovenbird_2025_EDI_localization_dataset_labeled_clips/blob/main/localization_metadata/audio_file_table.csv)
 
-- `relative` path provides the path to the audio file relative to the top-level of the dataset, e.g.   
-`/audio/recorder001/clip101.wav`
-- `point_id` matches a value of point_id in the point_table.csv, the location where the audio file was recorded
+- `file_id`: filename. Should match values in point_table and localized_events.
+- `relative_path`: path to the audio file relative to the top-level of the dataset, e.g.`/audio/recorder001/clip101.wav`.
+- `recorder_id`: recorder key.
+- `card_id`: SD card key used in recorder.
+- `point_id` deployment point key. Should match those in point_id.
 
 ### Project metadata and supplementary files
 These should be **sufficient to reproduce** the localized_events.csv from the contents of localization_metadata and /audio/ (up to some human participation in the process).
