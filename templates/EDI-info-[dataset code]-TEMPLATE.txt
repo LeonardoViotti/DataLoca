@@ -20,7 +20,7 @@ Geographic Coverage (in degrees EPSG:2346 WGS84 or what you get if you click on 
     South Bounding Coordinate: 
 
 Metadata Coordinate Reference System (CRS):
-    CRS with EPSG code or Specify that is relative.
+    CRS with EPSG code, or specify that it is relative.
     
 Temporal Coverage:
     Begin Date:
@@ -45,9 +45,9 @@ Abstract:
 Methods:
     Method steps are descriptions of specific steps of the method employed when collecting data. They are intended to be descriptive, i.e., human-readable rather than machine-readable. Must contain two components
 
-    Collection: descriptions of data collections steps
+    Collection: descriptions of data collection steps
     
-    Validation: descriptions of methods use for quality assurance
+    Validation: descriptions of methods used for quality assurance
     
 Keywords:
     
