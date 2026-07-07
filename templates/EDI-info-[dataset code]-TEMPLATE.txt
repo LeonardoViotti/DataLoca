@@ -12,7 +12,7 @@ Creators:
 Contacts:
         Last name, first name (email). Affiliation. https://orcid.org/xxxxx
 
-Geographic Coverage (in degrees EPSG:2346 WGS84 or what you get if you click on google maps):
+Geographic Coverage (in degrees EPSG:4326 WGS84 or what you get if you click on google maps):
     Geographic Description: 
     West Bounding Coordinate: 
     East Bounding Coordinate: 
