@@ -1,0 +1,56 @@
+Name: 
+    DataLoca: [Project name] 
+
+Title:
+    DataLoca: [Project name] + Short description. It should be descriptive and should mention the data collected, geographic context, research site, and time frame (i.e., what, where, and when).
+
+Creators:
+    Last name, first name (email). Affiliation. https://orcid.org/xxxxx
+    Last name, first name (email). Affiliation. https://orcid.org/xxxxx
+    Last name, first name (email). Affiliation. https://orcid.org/xxxxx
+
+Contacts:
+        Last name, first name (email). Affiliation. https://orcid.org/xxxxx
+
+Geographic Coverage (in degrees EPSG:2346 WGS84 or what you get if you click on google maps):
+    Geographic Description: 
+    West Bounding Coordinate: 
+    East Bounding Coordinate: 
+    North Bounding Coordinate: 
+    South Bounding Coordinate: 
+
+Metadata Coordinate Reference System (CRS):
+    CRS with EPSG code or Specify that is relative.
+    
+Temporal Coverage:
+    Begin Date:
+    End Date:
+
+Taxonomic Coverage:
+    Species 1 scientific name
+    Species 2 scientific name
+    ...
+    Species N scientific name
+
+
+Abstract:
+    The Abstract will be used by full-text searches, and it should be rich with descriptive text. Multiple paragraphs may be included. It should contain enough information to allow potential data users to understand the data and decide on its fitness for use.
+
+    The abstract should be about the data, not the paper the data was used in.
+
+    In particular, descriptions should include information that does not fit into structured metadata, and focus on the “what”, “when”, and “where” information, general taxonomic information, as well as whether the data package is ongoing or completed.
+
+    Some general methods description is appropriate, and broad classes of measured parameters should also be included. For a large number of parameters, use categories instead of listing all parameters (e.g. use the term “nutrients” instead of nitrate, phosphate, calcium, etc.), in combination with the parameters that seem most relevant for search.
+
+Methods:
+    Method steps are descriptions of specific steps of the method employed when collecting data. They are intended to be descriptive, i.e., human-readable rather than machine-readable. Must contain two components
+
+    Collection: descriptions of data collections steps
+    
+    Validation: descriptions of methods use for quality assurance
+    
+Keywords:
+    
+
+Intellectual Rights:
+    Suggestion is to use Creative Commons license - Attribution - CC BY 4.0
