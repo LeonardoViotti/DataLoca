@@ -227,7 +227,7 @@ Subfolder containing records of events seen (or produced) in person with positio
 
 | playback_id | label | start_timestamp | duration | x | y | z | file_id | file_start_time_offsets |
 |-------------|-------|-----------------|----------|---|---|---|---------|-------------------------|
-| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 | 6124222.74555885 | nan | | |
+| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 | 6124222.74555885 | nan | ['KAAM1-2025.flac', 'KAAM2-2025.flac', 'KAAM7-2025.flac','KAAM8-2025.flac' ] | [73.0, 73.0, 73.0, 73.0]|
 
 Columns:
 - `playback_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
