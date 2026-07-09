@@ -244,10 +244,11 @@ Columns:
 ### Field observations with positions (observed_events/observations.csv)
 
 Table of human field observations of acoustic events with known positions
+
 | observed_event_id | label | start_timestamp | duration | x | y | z | direction |
 |-------------------|-------|-----------------|----------|---|---|---|-----------|
-| focalfollow01 | KAAM_song_a | 2025-05-20T10:45:00 | 5 | 662516.184452 | 6124222.74555885 | nan | 15 degrees |
-| focalfollow02 | KAAM_song_b | 2025-05-20T11:06:00 | 45 | 662516.184452 | 6124222.74555885 | nan | 60 degrees |
+| KAAM_obs1 | KAAM_song_a | 2025-05-20T10:45:00 | 5 | 662516.184452 | 6124222.74555885 | nan | 15 degrees |
+| KAAM_obs2 | KAAM_song_b | 2025-05-20T11:06:00 | 45 | 662516.184452 | 6124222.74555885 | nan | 60 degrees |
 
 Columns:
 - `observed_event_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
