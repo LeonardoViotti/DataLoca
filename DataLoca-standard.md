@@ -66,7 +66,7 @@ All localized events should be contained within this table.
 
 
 | event_id | label | start_timestamp | duration | x | y | z | file_ids | file_start_time_offsets | tdoas | distance_residuals |
-|----------|-------|----------------|----------|------------|------------|------|----------|------------------------|-------|-------------------|
+|----------|-------|-----------------|----------|---|---|---|----------|-------------------------|-------|--------------------|
 | 2022020720_000 | BTBW | 2022-02-07 20:00:06-05:00 | 3 | -87.02998309 | 59.50950925 |  | [R006.WAV, R002.WAV, R004.WAV, R003.WAV, R008.WAV, R009.WAV, R005.WAV] | [6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0] | [0.0, 0.1280173, 0.1276840, 0.1305381, -0.0010869, -0.0015244, -0.0019202] | [0.0, -0.425, -0.932, -0.795, 0.295, -0.108, 0.010] |
 | 2022020720_001 | BTBW | 2022-02-07 20:00:06-05:00 | 3 | -87.00133077 | 59.19430599 |  | [R009.WAV, R008.WAV, R007.WAV, R006.WAV, R005.WAV] | [6.0, 6.0, 6.0, 6.0, 6.0] | [0.0, 0.0004548, 0.1302256, 0.0015381, -0.0010452] | [0.0, -0.051, -2.196, 0.145, -0.063] |
 | 2022020720_002 | BTBW | 2022-02-07 20:00:09-05:00 | 3 | -28.73259570 | 19.98542163 |  | [R001.WAV, R002.WAV, R004.WAV, R003.WAV, R007.WAV, R005.WAV] | [9.0, 9.0, 9.0, 9.0, 9.0, 9.0] | [0.0, 0.0026006, 0.0006423, 0.1321215, 0.1337673, 0.0003715] | [0.0, -0.424, 0.269, -1.638, -2.053, 0.433] |
@@ -97,7 +97,7 @@ This optional file lists and describes all classes (sound types) that occur in t
 #### Example Structure  
 
 | class | species | scientific_name | vocalization_type | description |
-| --- | --- | --- | --- | --- |
+|-------|---------|-----------------|-------------------|-------------|
 | KAAM_song_a | Kauai Amakihi | *Chlorodrepanis stejnegeri* |  A  | typical song |
 | KAAM_song_b | Kauai Amakihi | *Chlorodrepanis stejnegeri* |  B  | whisper song |
 | KAAM_call | Kauai Amakihi | *Chlorodrepanis stejnegeri* |   |  |
@@ -111,7 +111,7 @@ These tables join to localized_events.csv via file_id / point_id (see Terminolog
 This table organizes the location metadata associated with each point. Point IDs from this table align with Point IDs from the audio file table (audio_file_table.csv). The coordinates refer to the microphone's position in meters, either using a projected CRS (e.g., UTM) or relative position offsets from a point (e.g., center of the array). The coordinate system should be referred to in the dataset readme.md.
 
 | point_id | x | y | z | array_id |
-|----------|-------------|---|---|---|----------|
+|----------|---|---|---|----------|
 | loca_rail_01  | 61.88444952 | 244.9906262 | 23.176 | A1 |
 | loca_rail_02  | 102.7985465 | 229.6864791 | 24.465 | A2 |
 | loca_rail_03  | 135.8973872 | 220.6227250 | 24.663 | A2 |
@@ -161,7 +161,7 @@ audio/
 localization_metadata/audio_file_table.csv first row:
 
 | file_id | relative_path | point_id | start_timestamp |
-| --- | --- | --- | --- | 
+|---------|---------------|----------|-----------------| 
 | clip0001 | audio/clip0001.flac | ABC12 | 2025-01-01T06:00:00.000-05:00 | 
 
 
@@ -180,7 +180,7 @@ localization_metadata/audio_file_table.csv first row:
 
 
 | file_id | relative_path | point_id | start_timestamp | 
-| --- | --- | --- | ---| 
+|---------|---------------|----------|-----------------| 
 | aru001_20250101_060000 | audio/aru001/20250101_060000.WAV | aru001 | 2025-01-01T06:00:00.000-05:00 |
 
 ### Example 3: Long audio files nested by recorder and round (or other category)
@@ -204,7 +204,7 @@ audio/
 localization_metadata/audio_file_table.csv first row:
 
 | file_id | relative_path | point_id | start_timestamp | round |
-| --- | --- | --- | --- | --- |
+|---------|---------------|----------|-----------------|-------|
 | aru001_20250101_060000_round2025 | audio/round2025/aru001/20250101_060000.WAV | aru001 | 2025-01-01T06:00:00.000-05:00 | 2025 | 
 
 
@@ -226,8 +226,8 @@ Subfolder containing records of events seen (or produced) in person with positio
 ### Acoustic playback experiments (observed_events/playbacks.csv)
 
 | playback_id | label | start_timestamp | duration | x | y | z | file_id | file_start_time_offsets |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 | 6124222.74555885 | nan | | |
+|-------------|-------|-----------------|----------|---|---|---|---------|-------------------------|
+| playback001 | KAAM_playback | 2025-07-20T10:00:00.000-05:00 | 100 | 662516.184452 | 6124222.74555885 | nan | ['KAAM1-2025.flac', 'KAAM2-2025.flac', 'KAAM7-2025.flac','KAAM8-2025.flac' ] | [73.0, 73.0, 73.0, 73.0]|
 
 Columns:
 - `playback_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
@@ -244,10 +244,11 @@ Columns:
 ### Field observations with positions (observed_events/observations.csv)
 
 Table of human field observations of acoustic events with known positions
+
 | observed_event_id | label | start_timestamp | duration | x | y | z | direction |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| focalfollow01 | KAAM_song_a | 2025-05-20T10:45:00 | 5 | 662516.184452 | 6124222.74555885 | nan | 15 degrees |
-| focalfollow02 | KAAM_song_b | 2025-05-20T11:06:00 | 45 | 662516.184452 | 6124222.74555885 | nan | 60 degrees |
+|-------------------|-------|-----------------|----------|---|---|---|-----------|
+| KAAM_obs1 | KAAM_song_a | 2025-05-20T10:45:00 | 5 | 662516.184452 | 6124222.74555885 | nan | 15 degrees |
+| KAAM_obs2 | KAAM_song_b | 2025-05-20T11:06:00 | 45 | 662516.184452 | 6124222.74555885 | nan | 60 degrees |
 
 Columns:
 - `observed_event_id`: unique within the dataset; fixed length; only alphanumeric characters and underscores
