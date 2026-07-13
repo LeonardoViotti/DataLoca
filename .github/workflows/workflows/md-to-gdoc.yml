@@ -1,0 +1,31 @@
+name: Convert Markdown to Google Doc
+
+on:
+  push:
+    paths:
+      - 'DataLoca-standard-checklist.md' # Triggers when markdown files change in this folder
+  workflow_dispatch: # Allows you to run it manually
+
+jobs:
+  convert-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Convert Markdown to Word (.docx)
+        run: |
+          # Converts document.md into a docx format that Google Drive understands
+          pandoc documents/my-file.md -o my-file.docx
+
+      - name: Upload and Convert to Google Doc
+        uses: adityasshari/upload-to-google-drive@v2 # Popular community marketplace action
+        with:
+          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
+          filename: 'test.docx'
+          folderId: '1_SGePqOgO8nk1wzd8b57iZ8kj0o1iT_G'
+          # This converts the docx to Google Doc format automatically
+          convertToGoogleDocs: true 
