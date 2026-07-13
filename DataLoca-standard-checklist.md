@@ -1,8 +1,7 @@
 # DataLoca Dataset Preparation Checklist
 
-*For packaging a terrestrial acoustic localization dataset to the DataLoca standard (v0.5).*
+*For packaging a terrestrial acoustic localization dataset to the DataLoca standard (v0.5)*
 
-Work top to bottom: assemble the required components first, add optional ones as applicable.
 ---
 
 ## 1. Required top-level structure
@@ -82,7 +81,7 @@ Work top to bottom: assemble the required components first, add optional ones as
 - [ ] Other observation-type files (spot mapping, point counts, transects, focal follows) added under `/observed_events/` as needed
 
 
-## 09. Formatting conventions
+## 9. Formatting conventions
 
 - [ ] **List columns are JSON array strings**, not bare comma lists — e.g. `["R006.WAV","R002.WAV"]`
 - [ ] All timestamps are ISO format with an explicit UTC offset
