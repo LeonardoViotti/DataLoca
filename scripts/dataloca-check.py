@@ -14,21 +14,24 @@ How to run the script:
     python dataloca-check.py <dataset_dir>
     python dataloca-check.py <dataset_dir> --min-n-receivers 4 --max-receiver-dist 100
     python dataloca-check.py <dataset_dir> --sample 20
+    python dataloca-check.py <dataset_dir> --params my-params.yaml
 
 Exits with status 1 if any check fails.
 """
 
 
 import pandas as pd
+import numpy as np
 import os
 import re
 import ast
 import sys
 import time
 import argparse
+import yaml
 
 from opensoundscape import Audio
-from opensoundscape.localization import SynchronizedRecorderArray
+from opensoundscape.localization import SynchronizedRecorderArray, SpatialEvent
 
 
 events_filename = 'localized_events.csv'
@@ -43,9 +46,13 @@ audio_file_required_columns = ['file_id', 'relative_path', 'point_id']
 
 default_min_n_receivers = 4
 default_max_receiver_dist = 100
+default_sample = 100
+distance_pass_threshold_m = 2.0
 
 checklist_report_filename = 'checklist_report.csv'
+accuracy_report_filename = 'localization_accuracy.csv'
 default_checklist_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'DataLoca-standard-checklist.md')
+default_params_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data-check-params.yaml')
 
 # (checklist section number, regex matched against the item text, checklist_key)
 # checklist_key ties a checklist bullet to the log_result() call(s) that verify it.
@@ -75,10 +82,31 @@ def parse_args():
     parser.add_argument("dataset_dir", type=str, help = 'Path to DataLoca dataset folder.')
     parser.add_argument("--min-n-receivers", dest="min_n_receivers", type = int, default=default_min_n_receivers, help = "Minimum number of receivers for an event to be localized.")
     parser.add_argument("--max-receiver-dist", dest="max_receiver_dist", type = float, default=default_max_receiver_dist, help = "Maximum distance between receivers, in meters.")
-    parser.add_argument("--sample", type = int, default=None, help = "Take a smaller sample of events for debugging.")
+    parser.add_argument("--sample", type = int, default=default_sample, help = "Number of randomly sampled events to run checks and re-localization on (default 100). Pass 0 to use every event.")
     parser.add_argument("--checklist", type=str, default=default_checklist_path, help = "Path to DataLoca-standard-checklist.md, used to generate checklist_report.csv.")
+    parser.add_argument("--params", type=str, default=default_params_path, help = "Path to a YAML file of OpenSoundscape localization parameters.")
 
     return parser.parse_args()
+
+
+def load_params(params_path):
+    """Load OpenSoundscape localization parameters from a YAML file, falling back to defaults."""
+    defaults = {
+        'localization_algorithm': 'gillette',
+        'cc_threshold': 0,
+        'cc_filter': 'phat',
+        'max_delay': None,
+        'bandpass_range': None,
+        'speed_of_sound': 343.0,
+    }
+    try:
+        with open(params_path, 'r') as f:
+            loaded = yaml.safe_load(f) or {}
+    except OSError as exc:
+        print(f'WARNING: could not read params at {params_path} ({exc}); using OpenSoundscape defaults')
+        return defaults
+    defaults.update({k: v for k, v in loaded.items() if k in defaults})
+    return defaults
 
 
 def log_result(status, name, message, checklist_keys=None):
@@ -191,9 +219,11 @@ if __name__ == "__main__":
     if results.count('FAIL') > 0:
         finish(run_start)
 
-    if args.sample is not None:
-        events = events.head(args.sample)
-        print(f'\nUsing a sample of {len(events)} events.\n')
+    if args.sample and args.sample < len(events):
+        events = events.sample(n=args.sample, random_state=0).reset_index(drop=True)
+        print(f'\nUsing a random sample of {len(events)} events (seed 0).\n')
+    else:
+        print(f'\nUsing all {len(events)} events.\n')
 
     # Table keys -----------------------------------------------------------------------
     if audio_file_table['file_id'].duplicated().any():
@@ -328,18 +358,79 @@ if __name__ == "__main__":
     else:
         log_result('PASS', 'density', f'{feasible_timestamps} of {detections.index.get_level_values("start_timestamp").nunique()} timestamps can form a candidate event')
 
-    # Run localization -----------------------------------------------------------------
+    # Re-localize sampled events one at a time ----------------------------------------
+    # Each event row already lists the receivers that participated (file_ids) and their
+    # per-file offsets, so we build one SpatialEvent per row and compare the re-estimated
+    # position to the (x, y[, z]) stored in localized_events.csv. No event-to-estimate
+    # matching is needed: one row in, one estimate out.
+    params = load_params(args.params)
+    speed_of_sound = params['speed_of_sound']
+    max_delay = params['max_delay']
+    if max_delay is None:
+        max_delay = args.max_receiver_dist / speed_of_sound
+
     localize_start = time.time()
-    try:
-        position_estimates = array.localize_detections(
-            detections=detections,
-            min_n_receivers=args.min_n_receivers,
-            max_receiver_dist=args.max_receiver_dist)
-        if len(position_estimates) == 0:
-            log_result('FAIL', 'localize_detections', f'ran without error but returned 0 position estimates in {time.time() - localize_start:.1f}s')
-        else:
-            log_result('PASS', 'localize_detections', f'returned {len(position_estimates)} position estimates in {time.time() - localize_start:.1f}s')
-    except Exception as exc:
-        log_result('FAIL', 'localize_detections', f'{type(exc).__name__}: {exc}')
+    accuracy_rows = []
+    for _, event in events.iterrows():
+        file_ids = parse_list_column(event['file_ids'])
+        offsets = [float(o) for o in parse_list_column(event['file_start_time_offsets'])]
+        receiver_files = [audio_path_by_file_id[f] for f in file_ids]
+        receiver_locations = [file_coords.loc[p].tolist() for p in receiver_files]
+
+        stored_position = [event[c] for c in coordinate_columns]
+        estimate, error = None, None
+        try:
+            spatial_event = SpatialEvent(
+                receiver_files=receiver_files,
+                receiver_locations=receiver_locations,
+                receiver_start_time_offsets=offsets,
+                start_timestamp=pd.Timestamp(event['start_timestamp']),
+                duration=float(event['duration']),
+                class_name=event['label'],
+                max_delay=max_delay,
+                min_n_receivers=args.min_n_receivers,
+                cc_threshold=params['cc_threshold'],
+                cc_filter=params['cc_filter'],
+                bandpass_range=params['bandpass_range'],
+                speed_of_sound=speed_of_sound)
+            estimate = spatial_event.estimate_location(
+                localization_algorithm=params['localization_algorithm']).location_estimate
+        except Exception as exc:
+            error = f'{type(exc).__name__}: {exc}'
+
+        localized = estimate is not None
+        distance = None
+        if localized and all(pd.notna(stored_position)):
+            distance = float(np.linalg.norm(np.array(stored_position, dtype=float) - np.array(estimate, dtype=float)))
+
+        row = {'event_id': event['event_id'], 'label': event['label'], 'n_receivers': len(file_ids)}
+        for i, c in enumerate(coordinate_columns):
+            row[f'orig_{c}'] = stored_position[i]
+            row[f'est_{c}'] = estimate[i] if localized else None
+        row['distance_m'] = distance
+        row['localized'] = localized
+        row['error'] = error
+        accuracy_rows.append(row)
+
+    accuracy = pd.DataFrame(accuracy_rows)
+    accuracy_path = os.path.join(dataset_dir, accuracy_report_filename)
+    accuracy.to_csv(accuracy_path, index=False, encoding='utf-8-sig')
+    elapsed = time.time() - localize_start
+    print(f'\nLocalization accuracy table written to {accuracy_path} ({elapsed:.1f}s)')
+    print(accuracy.head(5).to_string(index=False))
+    print()
+
+    matched = accuracy[accuracy['distance_m'].notna()]
+    n_unlocalized = int((~accuracy['localized']).sum())
+    if len(matched) == 0:
+        log_result('FAIL', 'localize_detections', f'0 of {len(accuracy)} sampled events could be re-localized')
+    elif (matched['distance_m'] < distance_pass_threshold_m).all():
+        log_result('PASS', 'localize_detections', f'all {len(matched)} re-localized events within {distance_pass_threshold_m:g} m of stored position (max {matched["distance_m"].max():.2f} m)')
+    else:
+        n_far = int((matched['distance_m'] >= distance_pass_threshold_m).sum())
+        log_result('FAIL', 'localize_detections', f'{n_far} of {len(matched)} re-localized events are >= {distance_pass_threshold_m:g} m from stored position (max {matched["distance_m"].max():.2f} m)')
+
+    if n_unlocalized:
+        log_result('WARN', 'localize_detections', f'{n_unlocalized} of {len(accuracy)} sampled events failed to re-localize (excluded from the distance check)')
 
     finish(run_start)

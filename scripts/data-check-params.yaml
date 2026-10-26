@@ -1,0 +1,9 @@
+# OpenSoundscape localization parameters used by dataloca-check.py.
+# Values below are the OpenSoundscape defaults; edit to override.
+
+localization_algorithm: gillette   # 'gillette' or 'soundfinder'
+cc_threshold: 0                     # min cross-correlation value for a TDOA to be used
+cc_filter: phat                    # generalized cross-correlation filter
+max_delay: null                    # seconds; null -> max_receiver_dist / speed_of_sound
+bandpass_range: null               # null, or [low_hz, high_hz] applied before cross-correlation
+speed_of_sound: 343.0              # m/s
